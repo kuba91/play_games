@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.common.images.ImageManager;
@@ -38,6 +39,7 @@ import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -153,35 +155,33 @@ public class Request {
     }
 
     public void unlockAchievement(String id) {
-        Games.getAchievementsClient(registrar.activity(), currentAccount).unlockImmediate(id)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void a) {
-                        result(true);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Could not unlock achievement", e);
-                        result(false);
-                    }
-                });
+        Games.getAchievementsClient(registrar.activity(), currentAccount).unlockImmediate(id).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void a) {
+                result(true);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Could not unlock achievement", e);
+                result(false);
+            }
+        });
     }
 
     public void incrementAchievement(String id, int amount) {
-        Games.getAchievementsClient(registrar.activity(), currentAccount).incrementImmediate(id, amount)
-                .addOnSuccessListener(new OnSuccessListener<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean b) {
-                        result(true);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Could not increment achievement", e);
-                        result(false);
-                    }
-                });
+        Games.getAchievementsClient(registrar.activity(), currentAccount).incrementImmediate(id, amount).addOnSuccessListener(new OnSuccessListener<Boolean>() {
+            @Override
+            public void onSuccess(Boolean b) {
+                result(true);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Could not increment achievement", e);
+                result(false);
+            }
+        });
     }
 
     public void setPopupOptions(boolean show, int gravity) {
@@ -315,9 +315,7 @@ public class Request {
             return;
         }
         snapshot.getSnapshotContents().writeBytes(content.getBytes());
-        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
-                .setDescription(metadata.get("description"))
-                .build();
+        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().setDescription(metadata.get("description")).build();
         snapshotsClient.commitAndClose(snapshot, metadataChange).addOnSuccessListener(new OnSuccessListener<SnapshotMetadata>() {
             @Override
             public void onSuccess(SnapshotMetadata snapshotMetadata) {
@@ -344,11 +342,10 @@ public class Request {
             return;
         }
         snapshot.getSnapshotContents().writeBytes(content.getBytes());
-        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
-                .setDescription(metadata.get("description"))
-                .build();
+        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().setDescription(metadata.get("description")).build();
 
-        snapshotsClient.resolveConflict(conflictId, snapshot.getMetadata().getSnapshotId(), metadataChange, snapshot.getSnapshotContents()).addOnSuccessListener(generateCallback(snapshotName)).addOnFailureListener(new OnFailureListener() {
+        snapshotsClient.resolveConflict(conflictId, snapshot.getMetadata().getSnapshotId(), metadataChange,
+                snapshot.getSnapshotContents()).addOnSuccessListener(generateCallback(snapshotName)).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 error("RESOLVE_SNAPSHOT_CONFLICT_ERROR", e);
@@ -365,7 +362,8 @@ public class Request {
         metadata.put("snapshotId", snapshot.getMetadata().getSnapshotId());
         metadata.put("uniqueName", snapshot.getMetadata().getUniqueName());
         metadata.put("coverImageAspectRatio", snapshot.getMetadata().getCoverImageAspectRatio());
-        metadata.put("coverImageUri", snapshot.getMetadata().getCoverImageUri() == null ? null : snapshot.getMetadata().getCoverImageUri().toString());
+        metadata.put("coverImageUri", snapshot.getMetadata().getCoverImageUri() == null ? null :
+                snapshot.getMetadata().getCoverImageUri().toString());
         metadata.put("lastModifiedTimestamp", snapshot.getMetadata().getLastModifiedTimestamp());
 
         Map<String, Object> data = new HashMap<>();
@@ -399,32 +397,29 @@ public class Request {
         });
     }
 
-    public void loadPlayerCenteredScores(String leaderboardId, String timeSpan, String collectionType, int maxResults, boolean forceReload) {
+    public void loadPlayerCenteredScores(String leaderboardId, String timeSpan, String collectionType, int maxResults,
+                                         boolean forceReload) {
         LeaderboardsClient leaderboardsClient = Games.getLeaderboardsClient(this.registrar.activity(), currentAccount);
-        leaderboardsClient.loadPlayerCenteredScores(leaderboardId, convertTimeSpan(timeSpan), convertCollection(collectionType), maxResults, forceReload)
-            .addOnSuccessListener(scoreSuccessHandler())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Could not fetch leaderboard player centered (retrieve failure)", e);
-                    error("LEADERBOARD_PLAYER_CENTERED_FAILURE", e);
-                }
+        leaderboardsClient.loadPlayerCenteredScores(leaderboardId, convertTimeSpan(timeSpan), convertCollection(collectionType),
+                maxResults, forceReload).addOnSuccessListener(scoreSuccessHandler()).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Could not fetch leaderboard player centered (retrieve failure)", e);
+                error("LEADERBOARD_PLAYER_CENTERED_FAILURE", e);
             }
-        );
+        });
     }
 
     public void loadTopScores(String leaderboardId, String timeSpan, String collectionType, int maxResults, boolean forceReload) {
         LeaderboardsClient leaderboardsClient = Games.getLeaderboardsClient(this.registrar.activity(), currentAccount);
-        leaderboardsClient.loadTopScores(leaderboardId, convertTimeSpan(timeSpan), convertCollection(collectionType), maxResults, forceReload)
-            .addOnSuccessListener(scoreSuccessHandler())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Could not fetch leaderboard top scores (retrieve failure)", e);
-                    error("LEADERBOARD_TOP_SCORES_FAILURE", e);
-                }
+        leaderboardsClient.loadTopScores(leaderboardId, convertTimeSpan(timeSpan), convertCollection(collectionType), maxResults,
+                forceReload).addOnSuccessListener(scoreSuccessHandler()).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "Could not fetch leaderboard top scores (retrieve failure)", e);
+                error("LEADERBOARD_TOP_SCORES_FAILURE", e);
             }
-        );
+        });
     }
 
     private OnSuccessListener<AnnotatedData<LeaderboardsClient.LeaderboardScores>> scoreSuccessHandler() {
