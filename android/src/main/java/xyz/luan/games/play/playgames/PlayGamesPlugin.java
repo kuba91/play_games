@@ -211,9 +211,9 @@ public class PlayGamesPlugin implements MethodCallHandler, ActivityResultListene
                 Map<String, Object> successMap = new HashMap<>();
                 successMap.put("type", "SUCCESS");
                 successMap.put("id", player.getPlayerId());
-                successMap.put("email", currentAccount.getEmail());
+                successMap.put("email", currentAccount.getEmail() != null ? currentAccount.getEmail() : "");
                 successMap.put("displayName", player.getDisplayName());
-                successMap.put("hiResImageUri", player.getHiResImageUri().toString());
+                successMap.put("hiResImageUri", player.getHiResImageUri() != null ? player.getHiResImageUri().toString() : "");
                 successMap.put("iconImageUri", player.getIconImageUri().toString());
                 result(successMap);
             }
